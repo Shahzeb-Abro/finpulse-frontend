@@ -13,6 +13,7 @@ import { ROUTES } from "@/routes/routes";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { BotMessageSquare } from "lucide-react";
 
 const NAV_ITEMS = [
   {
@@ -41,12 +42,18 @@ const NAV_ITEMS = [
   },
   {
     id: 5,
+    icon: <BotMessageSquare height={24} />,
+    label: "AI Assistant",
+    to: ROUTES.aiAssistant,
+  },
+  {
+    id: 6,
     icon: <IconReceipt height={24} width={24} />,
     label: "Recurring Bills",
     to: ROUTES.recurringBills,
   },
   {
-    id: 6,
+    id: 7,
     icon: <IconWrench height={24} width={24} />,
     label: "Settings",
     to: ROUTES.settings,
