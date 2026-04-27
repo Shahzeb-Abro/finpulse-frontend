@@ -10,4 +10,7 @@ export const ROUTES = {
   settings: "/settings",
   aiAssistant: "/ai-assistant",
   chatSession: (sessionId) => `/ai-assistant/session/${sessionId}`,
+
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
 };
