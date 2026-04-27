@@ -1,6 +1,12 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ROUTES } from "./routes";
-import { Login, OAuthRedirect, Register } from "@/modules/public/auth";
+import {
+  ForgotPassword,
+  Login,
+  OAuthRedirect,
+  Register,
+  ResetPassword,
+} from "@/modules/public/auth";
 import { DashboardLayout } from "@/layouts";
 import {
   Budgets,
@@ -36,6 +42,8 @@ export const AppRouter = () => {
         <Route path={ROUTES.login} element={<Login />} />
         <Route path={ROUTES.register} element={<Register />} />
         <Route path={ROUTES.oauthRedirect} element={<OAuthRedirect />} />
+        <Route path={ROUTES.forgotPassword} element={<ForgotPassword />} />
+        <Route path={ROUTES.resetPassword} element={<ResetPassword />} />
       </Routes>
     </BrowserRouter>
   );
