@@ -8,4 +8,6 @@ export const ROUTES = {
   pots: "/pots",
   recurringBills: "/recurring-bills",
   settings: "/settings",
+  aiAssistant: "/ai-assistant",
+  chatSession: (sessionId) => `/ai-assistant/session/${sessionId}`,
 };

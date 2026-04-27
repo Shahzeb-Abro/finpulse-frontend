@@ -35,3 +35,7 @@ export const budgetTransactionSchema = z.object({
   date: z.coerce.date(),
   receiverName: z.string().optional(),
 });
+
+export const sessionSchema = z.object({
+  title: z.string().min(2, "Session title must be at least 2 characters long"),
+});

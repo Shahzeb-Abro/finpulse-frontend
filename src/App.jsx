@@ -11,7 +11,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <IntlProvider locale="en" defaultLocale="en">
           <AppRouter />
-          <ReactQueryDevtools />
+          {/* <ReactQueryDevtools /> */}
           <Toaster position="top-right" richColors />
         </IntlProvider>
       </QueryClientProvider>

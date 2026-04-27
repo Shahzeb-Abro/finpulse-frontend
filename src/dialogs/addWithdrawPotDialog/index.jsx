@@ -48,9 +48,15 @@ export const AddWithdrawPotDialog = ({
       const newPot = data?.data;
       queryClient.setQueryData(["pots"], (old) => {
         if (!old) return old;
+        console.log("Old pots:", old);
         return {
           ...old,
-          data: old.data.map((p) => (p.id === newPot.id ? newPot : p)),
+          data: {
+            ...old.data,
+            content: old.data?.content?.map((p) =>
+              p.id === newPot.id ? newPot : p,
+            ),
+          },
         };
       });
       setOpen(false);
