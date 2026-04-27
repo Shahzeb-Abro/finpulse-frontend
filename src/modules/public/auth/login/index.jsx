@@ -4,9 +4,9 @@ import { loginSchema } from "@/lib/validations";
 import { CustomFormGroup } from "@/components/customFormGroup";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ROUTES } from "@/routes/routes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IconEyeClosed, IconEyeOpen } from "@/components/icons";
 import { Logo } from "@/assets/svgs";
 import { useMutation } from "@tanstack/react-query";
@@ -17,6 +17,26 @@ import { AuthIllustration, ContinueWithGoogleButton } from "../components";
 export const Login = () => {
   const navigate = useNavigate();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const [searchParams] = useSearchParams();
+  const verified = searchParams.get("verified");
+  const reason = searchParams.get("reason");
+
+  useEffect(() => {
+    if (!verified) return;
+
+    const timer = setTimeout(() => {
+      if (verified === "true") {
+        toast.success("Email was verified successfully.");
+      } else if (verified === "false") {
+        toast.error(
+          reason || "Verification failed. Please request a new link.",
+        );
+      }
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [verified, reason]);
 
   const form = useForm({
     defaultValues: {
