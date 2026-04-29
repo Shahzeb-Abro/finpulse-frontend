@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -10,70 +10,50 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// ─── DataTable ───────────────────────────────────────────────
-// A headless, fully-styled table built on TanStack Table.
-//
-// Props:
-//   data       – array of row objects
-//   columns    – TanStack column defs (see examples below)
-//   pageSize   – rows per page (default 10)
-//   globalFilter / onGlobalFilterChange – controlled search
-//   sorting / onSortingChange           – controlled sorting
-//   manualPagination / pageCount        – server-side paging
-// ──────────────────────────────────────────────────────────────
-
 export const DataTable = ({
   data,
   columns,
-  pageSize = 10,
-  // Controlled global filter (from your SearchInput)
   globalFilter = "",
   onGlobalFilterChange,
-  // Controlled sorting (from your SortByDropdown)
-  sorting: controlledSorting,
+  sorting: controlledSorting = [],
   onSortingChange,
-  // Server-side pagination (optional)
   manualPagination = false,
   pageCount: controlledPageCount,
+  pagination, // ← single source of truth
+  setPagination,
+  totalElements,
+  isLoading = false,
 }) => {
-  // Internal state fallbacks when not controlled externally
-  const [internalSorting, setInternalSorting] = useState([]);
-  const [internalFilter, setInternalFilter] = useState("");
-
-  const sorting = controlledSorting ?? internalSorting;
-  const handleSortingChange = onSortingChange ?? setInternalSorting;
-  const filter = globalFilter ?? internalFilter;
-  const handleFilterChange = onGlobalFilterChange ?? setInternalFilter;
-
   const table = useReactTable({
     data,
     columns,
     state: {
-      sorting,
-      globalFilter: filter,
+      sorting: controlledSorting,
+      globalFilter,
+      pagination,
     },
-    onSortingChange: handleSortingChange,
-    onGlobalFilterChange: handleFilterChange,
+    onSortingChange,
+    onGlobalFilterChange,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    ...(manualPagination && {
-      manualPagination: true,
-      pageCount: controlledPageCount,
-    }),
-    initialState: {
-      pagination: {
-        pageSize,
-      },
-    },
+    manualPagination,
+    pageCount: controlledPageCount ?? -1,
+    enableSorting: false,
   });
 
-  const { pageIndex } = table.getState().pagination;
-  const totalPages = table.getPageCount();
+  const totalPages = manualPagination
+    ? (controlledPageCount ?? 0)
+    : table.getPageCount();
+
+  useEffect(() => {
+    console.log("Pagination changed", pagination);
+  }, [pagination.pageSize, pagination.pageIndex]);
 
   return (
-    <div className="flex flex-col gap-0">
+    <div className="flex flex-col gap-0 h-[calc(100vh-350px)]! lg:h-[calc(100vh-260px)]!">
       {/* ── Header ── */}
       <div className="flex items-center px-4 py-3 border-b border-grey-100">
         {table.getHeaderGroups().map((headerGroup) => (
@@ -81,20 +61,33 @@ export const DataTable = ({
             {headerGroup.headers.map((header) => (
               <div
                 key={header.id}
-                className="text-xs font-normal text-grey-500"
+                className={cn(
+                  "text-xs font-normal text-grey-500 select-none",
+                  header.column.getCanSort() &&
+                    "cursor-pointer hover:text-grey-900 transition-colors",
+                )}
                 style={{
                   width: header.getSize(),
                   minWidth: header.column.columnDef.minSize,
                   maxWidth: header.column.columnDef.maxSize,
                   flex: header.column.columnDef.meta?.flex ?? "none",
                 }}
+                onClick={header.column.getToggleSortingHandler()}
               >
-                {header.isPlaceholder
-                  ? null
-                  : flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
-                    )}
+                <div className="flex items-center gap-1">
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                  {header.column.getCanSort() && (
+                    <span className="text-grey-300">
+                      {{ asc: "↑", desc: "↓" }[header.column.getIsSorted()] ??
+                        "↕"}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -102,8 +95,12 @@ export const DataTable = ({
       </div>
 
       {/* ── Rows ── */}
-      <div className="flex flex-col">
-        {table.getRowModel().rows.length === 0 ? (
+      <div className="flex flex-col h-full overflow-y-auto">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12 text-sm text-grey-500">
+            Loading...
+          </div>
+        ) : table.getRowModel().rows.length === 0 ? (
           <div className="flex items-center justify-center py-12 text-sm text-grey-500">
             No results found.
           </div>
@@ -132,8 +129,30 @@ export const DataTable = ({
       </div>
 
       {/* ── Pagination ── */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 pt-6 pb-2">
+      <div className="flex items-center justify-between px-4 pt-6 pb-2">
+        {/* Left — record count */}
+        {totalElements != null ? (
+          <span className="text-xs text-grey-500">
+            {totalElements} record{totalElements !== 1 ? "s" : ""}
+          </span>
+        ) : (
+          <span />
+        )}
+
+        {/* Center — page number buttons */}
+        <div className="flex items-center gap-1">
+          <PageButtons
+            currentPage={pagination.pageIndex}
+            totalPages={totalPages}
+            onPageChange={(p) => {
+              console.log("Page button clicked:", p);
+              table.setPageIndex(p);
+            }}
+          />
+        </div>
+
+        {/* Right — Prev / Next */}
+        <div className="flex items-center gap-2">
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
@@ -147,14 +166,6 @@ export const DataTable = ({
             <ChevronLeft className="w-4 h-4" />
             Prev
           </button>
-
-          <div className="flex items-center gap-1">
-            <PageButtons
-              currentPage={pageIndex}
-              totalPages={totalPages}
-              onPageChange={(page) => table.setPageIndex(page)}
-            />
-          </div>
 
           <button
             onClick={() => table.nextPage()}
@@ -170,14 +181,12 @@ export const DataTable = ({
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
-      )}
+      </div>
     </div>
   );
 };
 
-// ─── Pagination button logic ─────────────────────────────────
-// Shows: 1 ... 4 [5] 6 ... 10  (with ellipsis for large sets)
-
+// ─── Page number buttons with ellipsis ────────────────────────
 const PageButtons = ({ currentPage, totalPages, onPageChange }) => {
   const pages = getVisiblePages(currentPage, totalPages);
 
@@ -214,21 +223,14 @@ function getVisiblePages(current, total) {
   }
 
   const pages = [];
-  // Always show first page
   pages.push(0);
-
   if (current > 2) pages.push("...");
 
-  // Window around current
   const start = Math.max(1, current - 1);
   const end = Math.min(total - 2, current + 1);
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
+  for (let i = start; i <= end; i++) pages.push(i);
 
   if (current < total - 3) pages.push("...");
-
-  // Always show last page
   pages.push(total - 1);
 
   return pages;
