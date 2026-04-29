@@ -55,3 +55,13 @@ export const resetPasswordSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export const transactionSchema = z.object({
+  amount: z.coerce.number().positive("Amount must be a positive number"),
+  description: z.string().optional(),
+  date: z.coerce.date(),
+  type: z.enum(["EXPENSE", "INCOME"], {
+    errorMap: () => ({ message: "Transaction type is required" }),
+  }),
+  category: z.coerce.number().min(1, "Category is required"),
+});

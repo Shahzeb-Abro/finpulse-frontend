@@ -7,6 +7,8 @@ import { AddBudgetTransactionDialog } from "./addBudgetTransactionDialog";
 import { AllSessionsDialog } from "./allSessionsDialog";
 import { DeleteSessionDialog } from "./deleteSessionDialog";
 import { RenameSessionDialog } from "./renameSessionDialog";
+import { AddEditTransactionDialog } from "./addEditTransactionDialog";
+import { DeleteTransactionDialog } from "./deleteTransactionDialog";
 
 export {
   AddEditBudgetDialog,
@@ -18,4 +20,6 @@ export {
   AllSessionsDialog,
   DeleteSessionDialog,
   RenameSessionDialog,
+  AddEditTransactionDialog,
+  DeleteTransactionDialog,
 };
