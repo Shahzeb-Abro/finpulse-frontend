@@ -1,24 +1,15 @@
 import { useForm } from "react-hook-form";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { Controller } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { SearchInput } from "@/components/SearchInput";
-import { SortByDropdown } from "@/dropdowns";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { CustomFormGroup } from "@/components/customFormGroup";
 import { ArrowDownCircle, ArrowUpCircle, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { getTransactionCategories, getTransactions } from "@/api/transaction";
 import { AddEditTransactionDialog, DeleteTransactionDialog } from "@/dialogs";
 import { useSearchParams } from "react-router-dom";
+import { TransactionFilters } from "..";
 
 // ─── Sort map — IDs aligned to SortByDropdown options ─────────
 // Latest=1, Oldest=2, A to Z=3, Z to A=4, Highest=5, Lowest=6
@@ -30,42 +21,6 @@ const SORT_MAP = {
   5: { sortBy: "amount", sortDir: "desc" }, // Highest
   6: { sortBy: "amount", sortDir: "asc" }, // Lowest
 };
-
-// ─── Inline filter select — matches SortByDropdown style ──────
-const FilterSelect = ({ control, name, label, options, placeholder }) => (
-  <CustomFormGroup
-    label={label}
-    name={name}
-    orientation="horizontal"
-    className="max-w-fit"
-  >
-    <Controller
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <Select
-          onValueChange={(val) => field.onChange(val)}
-          value={field.value}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={placeholder} />
-          </SelectTrigger>
-          <SelectContent className="rounded-[8px]">
-            {options.map((opt) => (
-              <SelectItem
-                key={opt.value}
-                value={opt.value}
-                className="h-12 px-4 text-sm cursor-pointer"
-              >
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-    />
-  </CustomFormGroup>
-);
 
 // ─── Column definitions ────────────────────────────────────────
 const buildColumns = (onEdit, onDelete) => [
@@ -177,6 +132,8 @@ export const TransactionsTable = () => {
   const sortByValue = searchParams.get("sortBy") ?? "";
   const typeFilter = searchParams.get("type") ?? "ALL";
   const categoryFilter = searchParams.get("category") ?? "ALL";
+  const dateFrom = searchParams.get("dateFrom") ?? null;
+  const dateTo = searchParams.get("dateTo") ?? null;
 
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [deletingTransaction, setDeletingTransaction] = useState(null);
@@ -187,6 +144,8 @@ export const TransactionsTable = () => {
       sortBy: sortByValue,
       type: typeFilter,
       category: categoryFilter,
+      dateFrom: null,
+      dateTo: null,
     },
   });
 
@@ -209,14 +168,45 @@ export const TransactionsTable = () => {
     });
   };
 
+  const handleExportPdf = () => {
+    const apiUrl = import.meta.env.VITE_API_URL;
+
+    const searchParts = [];
+    if (typeFilter !== "ALL")
+      searchParts.push(`transactionType::${typeFilter}`);
+    if (categoryFilter !== "ALL")
+      searchParts.push(`category.id::${categoryFilter}`);
+    if (dateFrom) searchParts.push(`transactionDate>=${dateFrom}`);
+    if (dateTo) searchParts.push(`transactionDate<=${dateTo}`);
+
+    const params = new URLSearchParams();
+    if (searchParts.length) params.set("search", searchParts.join(","));
+    if (searchValue) params.set("wildSearch", searchValue);
+
+    window.open(
+      `${apiUrl}/transactions/export/pdf?${params.toString()}`,
+      "_blank",
+    );
+  };
+
   const resetPage = () => updateParams({ page: 0 });
+
+  const isClearingRef = useRef(false);
 
   useEffect(() => {
     const subscription = form.watch((values, { name }) => {
       if (name === undefined) return; // skip programmatic resets
 
+      if (isClearingRef.current) return;
+
+      let value = values[name];
+      // Format dates as yyyy-MM-dd for URL params
+      if ((name === "dateFrom" || name === "dateTo") && value instanceof Date) {
+        value = format(value, "yyyy-MM-dd");
+      }
+
       updateParams({
-        [name]: values[name],
+        [name]: value,
         page: 0, // any filter change resets pagination
       });
     });
@@ -237,6 +227,8 @@ export const TransactionsTable = () => {
       sortParams,
       categoryFilter,
       typeFilter,
+      dateFrom,
+      dateTo,
     ],
     queryFn: () => {
       const searchParts = [];
@@ -244,6 +236,8 @@ export const TransactionsTable = () => {
         searchParts.push(`transactionType::${typeFilter}`);
       if (categoryFilter !== "ALL")
         searchParts.push(`category.id::${categoryFilter}`);
+      if (dateFrom) searchParts.push(`transactionDate>=${dateFrom}`); // ← add
+      if (dateTo) searchParts.push(`transactionDate<=${dateTo}`);
 
       return getTransactions({
         page,
@@ -281,6 +275,40 @@ export const TransactionsTable = () => {
 
   const columns = buildColumns(setEditingTransaction, setDeletingTransaction);
 
+  const activeFilterCount = [
+    typeFilter !== "ALL",
+    categoryFilter !== "ALL",
+    sortByValue !== "",
+    dateFrom !== null,
+    dateTo !== null,
+  ].filter(Boolean).length;
+
+  const handleClearFilters = () => {
+    isClearingRef.current = true;
+    // 1. Clear URL params
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete("sortBy");
+      next.delete("type");
+      next.delete("category");
+      next.delete("dateFrom");
+      next.delete("dateTo");
+      next.set("page", "0");
+
+      return next;
+    });
+
+    // 2. Sync form values to match cleared URL
+    form.setValue("sortBy", "");
+    form.setValue("type", "ALL");
+    form.setValue("category", "ALL");
+    form.setValue("dateFrom", null);
+    form.setValue("dateTo", null);
+
+    setTimeout(() => {
+      isClearingRef.current = false;
+    }, 0);
+  };
   return (
     <div className="py-6 px-5 flex flex-col gap-6 bg-white rounded-[12px]">
       {/* ── Toolbar ── */}
@@ -296,26 +324,13 @@ export const TransactionsTable = () => {
           />
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Category filter — same style as SortByDropdown */}
-          <FilterSelect
-            control={form.control}
-            name="category"
-            label="Category"
-            options={categoryOptions}
-            placeholder="All Categories"
-          />
-
-          {/* Sort */}
-          <div className="ml-auto">
-            <SortByDropdown
-              control={form.control}
-              name="sortBy"
-              label="Sort by"
-              onChange={resetPage}
-            />
-          </div>
-        </div>
+        <TransactionFilters
+          form={form}
+          categoryOptions={categoryOptions}
+          onClear={handleClearFilters}
+          onExport={handleExportPdf}
+          activeFilterCount={activeFilterCount}
+        />
       </div>
 
       {/* ── Table ── */}

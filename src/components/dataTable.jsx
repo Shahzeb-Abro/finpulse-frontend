@@ -53,7 +53,7 @@ export const DataTable = ({
   }, [pagination.pageSize, pagination.pageIndex]);
 
   return (
-    <div className="flex flex-col gap-0 h-[calc(100vh-350px)]! lg:h-[calc(100vh-260px)]!">
+    <div className="flex flex-col gap-0 h-[calc(100vh-350px)]! lg:h-[calc(100vh-280px)]!">
       {/* ── Header ── */}
       <div className="flex items-center px-4 py-3 border-b border-grey-100">
         {table.getHeaderGroups().map((headerGroup) => (

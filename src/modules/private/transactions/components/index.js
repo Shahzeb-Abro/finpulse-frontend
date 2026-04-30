@@ -1,3 +1,4 @@
 import { TransactionsTable } from "./transactionsTable";
+import { TransactionFilters } from "./transactionFilters";
 
-export { TransactionsTable };
+export { TransactionsTable, TransactionFilters };

@@ -43,7 +43,7 @@ export const DatePicker = ({
                 >
                   <CalendarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
                   {isValidDate ? (
-                    <span className="text-foreground">
+                    <span className="text-foreground shrink-0">
                       {format(dateValue, "PPP")}
                     </span>
                   ) : (

@@ -41,14 +41,15 @@ export const SortByDropdown = ({
   error,
   control,
   usedCategories = [],
+  orientation = "horizontal",
 }) => {
   return (
     <CustomFormGroup
       label={label}
       name={name}
       error={error}
-      orientation="horizontal"
-      className="max-w-40"
+      orientation={orientation}
+      className={orientation === "horizontal" ? "max-w-40" : ""}
     >
       <Controller
         control={control}
