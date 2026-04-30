@@ -21,6 +21,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { BudgetPeriod } from "./components";
 
 export const AddEditBudgetDialog = ({
   isEdit = false,
@@ -28,6 +29,7 @@ export const AddEditBudgetDialog = ({
 
   customTrigger = null,
 }) => {
+  console.log("AddEditBudgetDialog rendered with budget:", budget);
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const form = useForm({
@@ -35,6 +37,9 @@ export const AddEditBudgetDialog = ({
       budgetCategoryId: budget?.budgetCategoryId || "",
       maximumSpend: budget?.maximumSpend || "",
       budgetThemeId: budget?.budgetThemeId || "blue",
+      budgetPeriodId: budget?.budgetPeriodId || "",
+      startDate: budget?.startDate ? new Date(budget.startDate) : null,
+      endDate: budget?.endDate ? new Date(budget.endDate) : null,
     },
     resolver: zodResolver(budgetSchema),
   });
@@ -89,6 +94,7 @@ export const AddEditBudgetDialog = ({
   });
 
   const onSubmit = (data) => {
+    console.log("Form submitted with data:", data);
     if (isEdit) {
       editBudgetMutate(data);
     } else {
@@ -152,6 +158,23 @@ export const AddEditBudgetDialog = ({
                 />
               </CustomFormGroup>
             )}
+          />
+
+          <BudgetPeriod
+            control={form.control}
+            name="budgetPeriodId"
+            startDateName="startDate"
+            endDateName="endDate"
+            label="Budget Period"
+            setValue={form.setValue}
+            error={form.formState.errors.budgetPeriodId?.message}
+            defaultPeriodId={isEdit ? budget?.budgetPeriodId : null}
+            defaultStartDate={
+              isEdit && budget?.startDate ? new Date(budget.startDate) : null
+            }
+            defaultEndDate={
+              isEdit && budget?.endDate ? new Date(budget.endDate) : null
+            }
           />
 
           <ThemeColorDropdown

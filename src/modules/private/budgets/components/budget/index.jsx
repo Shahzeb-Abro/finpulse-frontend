@@ -10,6 +10,7 @@ import {
   DeleteBudgetDialog,
 } from "@/dialogs";
 import { ROUTES } from "@/routes/routes";
+import { ArrowUp } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Budget = ({ budget }) => {
@@ -59,7 +60,7 @@ export const Budget = ({ budget }) => {
 
 const SpentProgressBar = ({ amountSpent, budgetLimit, themeColor }) => {
   return (
-    <div className="h-8 rounded-sm bg-beige-100 w-full relative p-1">
+    <div className="h-8 rounded-sm bg-beige-100 w-full relative p-1 overflow-hidden">
       <div
         className="h-6 rounded-sm absolute top-1/2 left-1 translate-y-[-50%]"
         style={{
@@ -104,7 +105,7 @@ const BudgetTransactions = ({ transactions }) => {
       <div className="flex items-center gap-4 justify-between">
         <h4 className="text-base font-bold">Latest Spendings</h4>
         <Link
-          to={ROUTES.transactions}
+          to={ROUTES.categoryWiseTransaction(transactions?.[0]?.categoryId)}
           className="flex items-center gap-3 text-grey-500 text-sm hover:text-foreground"
         >
           <span>See All</span>
@@ -133,14 +134,16 @@ const BudgetTransactions = ({ transactions }) => {
 const BudgetTransactionItem = ({ transaction }) => {
   return (
     <div className="flex items-center gap-4 justify-between">
-      <div className="size-10 rounded-full bg-yellow-sec"></div>
+      <div className="size-10 rounded-full bg-yellow-sec flex items-center justify-center">
+        <ArrowUp className="size-4 text-white" />
+      </div>
       <div className="text-xs font-bold flex-1">
-        {transaction?.receiverName || "Unknown Receiver"}
+        {transaction?.description || "Unknown Receiver"}
       </div>
 
       <div className="flex flex-col gap-1 items-end">
         <div className="text-xs font-bold">
-          {transaction?.transactionType === "DEPOSIT" ? "-" : "+"}$
+          {transaction?.transactionType === "EXPENSE" ? "-" : "+"}$
           {transaction?.amount?.toFixed(2)}
         </div>
         <div className="text-xs text-grey-500">
@@ -160,14 +163,14 @@ const BudgetOptionsMenu = ({ budget }) => {
         </button>
       </PopoverTrigger>
       <PopoverContent className="flex max-w-40 w-full gap-1 flex-col   p-1 rounded-lg bg-white shadow-sm">
-        <AddBudgetTransactionDialog
+        {/* <AddBudgetTransactionDialog
           customTrigger={
             <button className="py-3 px-4 hover:bg-grey-100 rounded-sm text-left">
               Add Transaction
             </button>
           }
           budgetId={budget?.id}
-        />
+        /> */}
 
         <hr className="w-full border-t border-gray-100 " />
         <AddEditBudgetDialog
