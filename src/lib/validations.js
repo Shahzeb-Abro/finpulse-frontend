@@ -17,6 +17,9 @@ export const budgetSchema = z.object({
     .number()
     .positive("Maximum spend must be a positive number"),
   budgetThemeId: z.coerce.number().min(1, "Theme is required"),
+  budgetPeriodId: z.coerce.number().min(1, "Budget period is required"),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
 });
 
 export const potSchema = z.object({

@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { getTransactionCategories, getTransactions } from "@/api/transaction";
 import { AddEditTransactionDialog, DeleteTransactionDialog } from "@/dialogs";
+import { useSearchParams } from "react-router-dom";
 
 // ─── Sort map — IDs aligned to SortByDropdown options ─────────
 // Latest=1, Oldest=2, A to Z=3, Z to A=4, Highest=5, Lowest=6
@@ -168,40 +169,70 @@ const buildColumns = (onEdit, onDelete) => [
 
 // ─── Main Component ────────────────────────────────────────────
 export const TransactionsTable = () => {
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = Number(searchParams.get("page") ?? 0);
+  const pageSize = Number(searchParams.get("pageSize") ?? 10);
+  const searchValue = searchParams.get("search") ?? "";
+  const sortByValue = searchParams.get("sortBy") ?? "";
+  const typeFilter = searchParams.get("type") ?? "ALL";
+  const categoryFilter = searchParams.get("category") ?? "ALL";
 
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [deletingTransaction, setDeletingTransaction] = useState(null);
 
   const form = useForm({
     defaultValues: {
-      search: "",
-      sortBy: "",
-      type: "ALL",
-      category: "ALL",
+      search: searchValue,
+      sortBy: sortByValue,
+      type: typeFilter,
+      category: categoryFilter,
     },
   });
 
-  const searchValue = form.watch("search");
-  const sortByValue = form.watch("sortBy");
-  const typeFilter = form.watch("type");
-  const categoryFilter = form.watch("category");
+  const updateParams = (updates) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      Object.entries(updates).forEach(([key, value]) => {
+        if (
+          value === null ||
+          value === undefined ||
+          value === "" ||
+          value === "ALL"
+        ) {
+          next.delete(key);
+        } else {
+          next.set(key, String(value));
+        }
+      });
+      return next;
+    });
+  };
 
-  const resetPage = () => setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  const resetPage = () => updateParams({ page: 0 });
+
+  useEffect(() => {
+    const subscription = form.watch((values, { name }) => {
+      if (name === undefined) return; // skip programmatic resets
+
+      updateParams({
+        [name]: values[name],
+        page: 0, // any filter change resets pagination
+      });
+    });
+    return () => subscription.unsubscribe();
+  }, [form, setSearchParams]);
 
   const sortParams = SORT_MAP[sortByValue] ?? {
     sortBy: "transactionDate",
     sortDir: "desc",
   };
 
-  // ── Server-side fetch ────────────────────────────────────────
   const { data, isFetching } = useQuery({
     queryKey: [
       "transactions",
-      pagination.pageIndex,
+      page,
+      pageSize,
       searchValue,
       sortParams,
       categoryFilter,
@@ -215,8 +246,8 @@ export const TransactionsTable = () => {
         searchParts.push(`category.id::${categoryFilter}`);
 
       return getTransactions({
-        page: pagination.pageIndex,
-        pageSize: pagination.pageSize,
+        page,
+        pageSize,
         sort: `${sortParams.sortBy},${sortParams.sortDir}`,
         wildSearch: searchValue || undefined,
         search: searchParts.join(",") || undefined,
@@ -293,8 +324,14 @@ export const TransactionsTable = () => {
         columns={columns}
         manualPagination
         pageCount={totalPages}
-        pagination={pagination}
-        setPagination={setPagination}
+        pagination={{ pageIndex: page, pageSize }}
+        setPagination={(updater) => {
+          const newPagination =
+            typeof updater === "function"
+              ? updater({ pageIndex: page, pageSize })
+              : updater;
+          updateParams({ page: newPagination.pageIndex });
+        }}
         totalElements={totalElements}
         sorting={[]}
         isLoading={isFetching} // pass isFetching, not isLoading — works with placeholderData

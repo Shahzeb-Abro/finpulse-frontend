@@ -13,4 +13,6 @@ export const ROUTES = {
 
   forgotPassword: "/forgot-password",
   resetPassword: "/reset-password",
+  categoryWiseTransaction: (categoryId) =>
+    `/transactions?page=0&category=${categoryId}`,
 };
