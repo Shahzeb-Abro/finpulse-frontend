@@ -23,6 +23,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createTransaction, editTransaction } from "@/api/transaction";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const DESCRIPTION_MAX_LENGTH = 150;
 
@@ -33,6 +34,7 @@ export const AddEditTransactionDialog = ({
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
 }) => {
+  const { currencySymbol } = useCurrency();
   const queryClient = useQueryClient();
   const [internalOpen, setInternalOpen] = useState(false);
 
@@ -172,7 +174,9 @@ export const AddEditTransactionDialog = ({
                   {...field}
                   placeholder="e.g. 2000"
                   preComponent={
-                    <span className="text-xs font-medium text-grey-500">$</span>
+                    <span className="text-xs font-medium text-grey-500">
+                      {currencySymbol}
+                    </span>
                   }
                 />
               </CustomFormGroup>

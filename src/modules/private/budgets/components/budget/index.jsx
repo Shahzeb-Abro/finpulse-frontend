@@ -4,16 +4,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  AddBudgetTransactionDialog,
-  AddEditBudgetDialog,
-  DeleteBudgetDialog,
-} from "@/dialogs";
+import { useCurrency } from "@/context/CurrencyContext";
+import { AddEditBudgetDialog, DeleteBudgetDialog } from "@/dialogs";
 import { ROUTES } from "@/routes/routes";
 import { ArrowUp } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Budget = ({ budget }) => {
+  const { formatAmount } = useCurrency();
   return (
     <div className="flex flex-col gap-5 rounded-[12px] px-5 py-6 md:p-8 bg-white ">
       <div className="flex items-center gap-4 justify-between">
@@ -33,7 +31,7 @@ export const Budget = ({ budget }) => {
 
       <div className="flex flex-col gap-4">
         <div className="text-sm text-grey-500">
-          Maximum of ${budget?.maximumSpend?.toFixed(2)}
+          Maximum of {formatAmount(budget?.maximumSpend)}
         </div>
 
         <SpentProgressBar
@@ -73,6 +71,7 @@ const SpentProgressBar = ({ amountSpent, budgetLimit, themeColor }) => {
 };
 
 const SpendRemaining = ({ amountSpent, budgetLimit, themeColor }) => {
+  const { formatAmount } = useCurrency();
   const remaining = budgetLimit - amountSpent;
   return (
     <div className="flex items-center gap-4">
@@ -84,7 +83,7 @@ const SpendRemaining = ({ amountSpent, budgetLimit, themeColor }) => {
         ></span>
         <div className="flex flex-col gap-1">
           <span className="text-xs text-grey-500">Spent</span>
-          <span className="text-sm font-bold">${amountSpent?.toFixed(2)}</span>
+          <span className="text-sm font-bold">{formatAmount(amountSpent)}</span>
         </div>
       </div>
       {/* Remaining  */}
@@ -92,7 +91,7 @@ const SpendRemaining = ({ amountSpent, budgetLimit, themeColor }) => {
         <span className="w-1 h-11 rounded-lg bg-beige-100"></span>
         <div className="flex flex-col gap-1">
           <span className="text-xs text-grey-500">Remaining</span>
-          <span className="text-sm font-bold">${remaining.toFixed(2)}</span>
+          <span className="text-sm font-bold">{formatAmount(remaining)}</span>
         </div>
       </div>
     </div>
@@ -132,6 +131,7 @@ const BudgetTransactions = ({ transactions }) => {
 };
 
 const BudgetTransactionItem = ({ transaction }) => {
+  const { formatAmount } = useCurrency();
   return (
     <div className="flex items-center gap-4 justify-between">
       <div className="size-10 rounded-full bg-yellow-sec flex items-center justify-center">
@@ -143,8 +143,8 @@ const BudgetTransactionItem = ({ transaction }) => {
 
       <div className="flex flex-col gap-1 items-end">
         <div className="text-xs font-bold">
-          {transaction?.transactionType === "EXPENSE" ? "-" : "+"}$
-          {transaction?.amount?.toFixed(2)}
+          {transaction?.transactionType === "EXPENSE" ? "-" : "+"}
+          {formatAmount(transaction?.amount)}
         </div>
         <div className="text-xs text-grey-500">
           {transaction?.transactionDate || "Unknown Date"}
@@ -163,15 +163,6 @@ const BudgetOptionsMenu = ({ budget }) => {
         </button>
       </PopoverTrigger>
       <PopoverContent className="flex max-w-40 w-full gap-1 flex-col   p-1 rounded-lg bg-white shadow-sm">
-        {/* <AddBudgetTransactionDialog
-          customTrigger={
-            <button className="py-3 px-4 hover:bg-grey-100 rounded-sm text-left">
-              Add Transaction
-            </button>
-          }
-          budgetId={budget?.id}
-        /> */}
-
         <hr className="w-full border-t border-gray-100 " />
         <AddEditBudgetDialog
           isEdit

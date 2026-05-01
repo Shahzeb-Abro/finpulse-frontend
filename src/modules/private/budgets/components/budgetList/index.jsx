@@ -3,7 +3,7 @@ import { Budget } from "..";
 import { getAllBudgets } from "@/api/budget";
 
 export const BudgetList = () => {
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ["budgets"],
     queryFn: getAllBudgets,
   });

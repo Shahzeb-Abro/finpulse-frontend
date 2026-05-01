@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useCurrency } from "@/context/CurrencyContext";
 import { ThemeColorDropdown } from "@/dropdowns/themeColorDropdown";
 import { potSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +29,7 @@ export const AddEditPotDialog = ({
   pot = null,
   customTrigger = null,
 }) => {
+  const { currencySymbol } = useCurrency();
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
 
@@ -175,7 +177,9 @@ export const AddEditPotDialog = ({
                   {...field}
                   placeholder="e.g. 2000"
                   preComponent={
-                    <span className="text-xs font-medium text-grey-500">$</span>
+                    <span className="text-xs font-medium text-grey-500">
+                      {currencySymbol}
+                    </span>
                   }
                 />
               </CustomFormGroup>
