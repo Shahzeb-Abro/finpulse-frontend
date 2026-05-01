@@ -1,40 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { BudgetsSummaryChart } from "..";
 import { getBudgetSummary } from "@/api/budget";
-
-const SPENDING_SUMMARY_DATA = [
-  {
-    id: 1,
-    color: "hsl(177, 52%, 32%)",
-    category: "Entertainment",
-    amountSpent: 15,
-    budgetLimit: 150,
-  },
-  {
-    id: 2,
-    color: " hsl(190, 52%, 68%)",
-    category: "Bills",
-    amountSpent: 150,
-    budgetLimit: 750,
-  },
-  {
-    id: 3,
-    color: "hsl(28, 73%, 81%)",
-    category: "Dining Out",
-    amountSpent: 133,
-    budgetLimit: 75,
-  },
-  {
-    id: 4,
-    color: "hsl(259, 30%, 56%)",
-    category: "Personal Care",
-    amountSpent: 40,
-    budgetLimit: 100,
-  },
-];
+import { useCurrency } from "@/context/CurrencyContext";
 
 export const BudgetsSummary = () => {
-  const { data, isLoading } = useQuery({
+  const { currencySymbol, formatAmount } = useCurrency();
+  const { data } = useQuery({
     queryKey: ["budgetsSummary"],
     queryFn: getBudgetSummary,
   });
@@ -61,10 +32,10 @@ export const BudgetsSummary = () => {
                 </div>{" "}
                 <div className="flex items-center gap-1">
                   <span className="text-base font-bold">
-                    ${item.currentSpend.toFixed(2)}
+                    {formatAmount(item.currentSpend)}
                   </span>
                   <span className="text-xs text-grey-500">
-                    of ${item.maximumSpend.toFixed(2)}
+                    of {formatAmount(item.maximumSpend)}
                   </span>
                 </div>
               </div>

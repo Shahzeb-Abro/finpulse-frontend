@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useCurrency } from "@/context/CurrencyContext";
 import { cn } from "@/lib/utils";
 import { addWithdrawPotSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,6 +28,7 @@ export const AddWithdrawPotDialog = ({
   isWithdraw = false,
   customTrigger = null,
 }) => {
+  const { currencySymbol } = useCurrency();
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const form = useForm({
@@ -142,7 +144,7 @@ export const AddWithdrawPotDialog = ({
                     placeholder="e.g. 2000"
                     preComponent={
                       <span className="text-xs font-medium text-grey-500">
-                        $
+                        {currencySymbol}
                       </span>
                     }
                     autoFocus
@@ -176,6 +178,7 @@ const NewAmountDataAndProgress = ({
   isWithdraw,
   isAdd,
 }) => {
+  const { formatAmount } = useCurrency();
   const newAmount = isAdd
     ? amountSaved + parseFloat(addWithdrawAmont || 0)
     : amountSaved - parseFloat(addWithdrawAmont || 0);
@@ -188,7 +191,7 @@ const NewAmountDataAndProgress = ({
     <div className="flex flex-col gap-4 py-2">
       <div className="flex items-center gap-4 justify-between">
         <span className="text-sm text-grey-500">New Amount</span>
-        <span className="text-3xl font-bold">${newAmount.toFixed(2)}</span>
+        <span className="text-3xl font-bold">{formatAmount(newAmount)}</span>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -239,7 +242,7 @@ const NewAmountDataAndProgress = ({
             {((newAmount / targetAmount) * 100).toFixed(2)}%
           </span>
           <span className="flex-1 text-grey-500 text-right">
-            Target of ${targetAmount.toFixed(2)}
+            Target of {formatAmount(targetAmount)}
           </span>
         </div>
       </div>

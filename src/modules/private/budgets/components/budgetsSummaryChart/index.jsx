@@ -1,7 +1,9 @@
 import { PieChart, Pie, Cell } from "recharts";
 import { FormattedNumber } from "react-intl";
+import { useCurrency } from "@/context/CurrencyContext";
 
 export const BudgetsSummaryChart = ({ data }) => {
+  const { formatAmount } = useCurrency();
   const budegtSummaryItems = data?.budgetSummaryItems || [];
   return (
     <div className="relative size-60 flex items-center justify-center">
@@ -29,24 +31,10 @@ export const BudgetsSummaryChart = ({ data }) => {
           {/* Centered Content */}
           <div className="text-center flex flex-col gap-1">
             <h3 className="text-2xl font-bold text-gray-900">
-              <FormattedNumber
-                value={data?.totalCurrentSpend}
-                style="currency"
-                currency="USD"
-                minimumFractionDigits={0}
-                maximumFractionDigits={0}
-              />
+              {formatAmount(data?.totalCurrentSpend)}
             </h3>
             <p className="text-sm text-gray-500">
-              of{" "}
-              <FormattedNumber
-                value={data?.totalMaximumSpend}
-                style="currency"
-                currency="USD"
-                minimumFractionDigits={0}
-                maximumFractionDigits={0}
-              />{" "}
-              limit
+              of {formatAmount(data?.totalMaximumSpend)} limit
             </p>
           </div>
         </div>

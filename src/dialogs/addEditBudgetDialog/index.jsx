@@ -22,6 +22,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { BudgetPeriod } from "./components";
+import { useCurrency } from "@/context/CurrencyContext";
 
 export const AddEditBudgetDialog = ({
   isEdit = false,
@@ -29,7 +30,7 @@ export const AddEditBudgetDialog = ({
 
   customTrigger = null,
 }) => {
-  console.log("AddEditBudgetDialog rendered with budget:", budget);
+  const { currencySymbol } = useCurrency();
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const form = useForm({
@@ -153,7 +154,9 @@ export const AddEditBudgetDialog = ({
                   {...field}
                   placeholder="e.g. 2000"
                   preComponent={
-                    <span className="text-xs font-medium text-grey-500">$</span>
+                    <span className="text-xs font-medium text-grey-500">
+                      {currencySymbol}
+                    </span>
                   }
                 />
               </CustomFormGroup>

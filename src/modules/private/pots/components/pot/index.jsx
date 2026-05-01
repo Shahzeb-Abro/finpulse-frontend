@@ -5,6 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useCurrency } from "@/context/CurrencyContext";
 import {
   AddEditPotDialog,
   AddWithdrawPotDialog,
@@ -64,11 +65,12 @@ const PotActions = ({ pot }) => {
 };
 
 const PotProgressAndData = ({ amountSaved, targetAmount, themeColor }) => {
+  const { formatAmount } = useCurrency();
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-4 justify-between">
         <div className="text-sm text-grey-500">Total Saved</div>
-        <div className="text-3xl font-bold">${amountSaved.toFixed(2)}</div>
+        <div className="text-3xl font-bold">{formatAmount(amountSaved)}</div>
       </div>
       <div className="flex flex-col gap-3">
         <PotProgressBar
@@ -81,7 +83,7 @@ const PotProgressAndData = ({ amountSaved, targetAmount, themeColor }) => {
             {((amountSaved / targetAmount) * 100 || 0).toFixed(2)}%
           </span>
           <span className="flex-1 text-right">
-            Target of ${targetAmount.toFixed(2)}
+            Target of {formatAmount(targetAmount)}
           </span>
         </div>
       </div>

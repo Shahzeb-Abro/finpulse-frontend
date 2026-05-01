@@ -68,3 +68,7 @@ export const transactionSchema = z.object({
   }),
   category: z.coerce.number().min(1, "Category is required"),
 });
+
+export const preferencesSchema = z.object({
+  currency: z.coerce.number().min(1, "Currency is required"),
+});

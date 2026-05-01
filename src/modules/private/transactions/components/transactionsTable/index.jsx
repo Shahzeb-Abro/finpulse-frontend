@@ -10,6 +10,7 @@ import { getTransactionCategories, getTransactions } from "@/api/transaction";
 import { AddEditTransactionDialog, DeleteTransactionDialog } from "@/dialogs";
 import { useSearchParams } from "react-router-dom";
 import { TransactionFilters } from "..";
+import { useCurrency } from "@/context/CurrencyContext";
 
 // ─── Sort map — IDs aligned to SortByDropdown options ─────────
 // Latest=1, Oldest=2, A to Z=3, Z to A=4, Highest=5, Lowest=6
@@ -23,14 +24,13 @@ const SORT_MAP = {
 };
 
 // ─── Column definitions ────────────────────────────────────────
-const buildColumns = (onEdit, onDelete) => [
+const buildColumns = (onEdit, onDelete, formatAmount) => [
   {
     accessorKey: "description",
     header: "Description",
     meta: { flex: "1 1 0%" },
     cell: ({ row }) => {
-      const { description, categoryVisibleValue, transactionType } =
-        row.original;
+      const { description, transactionType } = row.original;
       const isIncome = transactionType === "INCOME";
       return (
         <div className="flex items-center gap-3">
@@ -90,7 +90,8 @@ const buildColumns = (onEdit, onDelete) => [
             isIncome && "text-green-sec ",
           )}
         >
-          {isIncome ? "+" : "-"}${Number(amount).toFixed(2)}
+          {isIncome ? "+" : "-"}
+          {formatAmount(amount)}
         </span>
       );
     },
@@ -124,6 +125,7 @@ const buildColumns = (onEdit, onDelete) => [
 
 // ─── Main Component ────────────────────────────────────────────
 export const TransactionsTable = () => {
+  const { formatAmount } = useCurrency();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get("page") ?? 0);
@@ -273,7 +275,11 @@ export const TransactionsTable = () => {
     })),
   ];
 
-  const columns = buildColumns(setEditingTransaction, setDeletingTransaction);
+  const columns = buildColumns(
+    setEditingTransaction,
+    setDeletingTransaction,
+    formatAmount,
+  );
 
   const activeFilterCount = [
     typeFilter !== "ALL",
