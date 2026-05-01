@@ -24,6 +24,7 @@ import { createTransaction, editTransaction } from "@/api/transaction";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useCurrency } from "@/context/CurrencyContext";
+import { format } from "date-fns";
 
 const DESCRIPTION_MAX_LENGTH = 150;
 
@@ -111,7 +112,7 @@ export const AddEditTransactionDialog = ({
         transactionType: data.type,
         amount: parseFloat(data.amount),
         description: data.description,
-        transactionDate: data.date.toISOString(),
+        transactionDate: format(data.date, "yyyy-MM-dd"),
         categoryId: data.category,
       };
 
@@ -121,7 +122,7 @@ export const AddEditTransactionDialog = ({
         transactionType: data?.type,
         amount: parseFloat(data.amount),
         description: data.description,
-        transactionDate: data.date.toISOString(),
+        transactionDate: format(data.date, "yyyy-MM-dd"),
         categoryId: data.category,
       };
 
