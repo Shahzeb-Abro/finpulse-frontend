@@ -65,9 +65,6 @@ export const BudgetPeriod = ({
   setValue,
   startDateName,
   endDateName,
-  defaultPeriodId,
-  defaultStartDate,
-  defaultEndDate,
 }) => {
   const { data } = useQuery({
     queryKey: ["budgetPeriods"],

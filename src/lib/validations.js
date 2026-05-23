@@ -72,3 +72,14 @@ export const transactionSchema = z.object({
 export const preferencesSchema = z.object({
   currency: z.coerce.number().min(1, "Currency is required"),
 });
+
+export const recurringBillSchema = z.object({
+  title: z.string().min(1, "Title is required").max(30),
+  amount: z.coerce.number().positive("Amount must be a positive number"),
+  description: z.string().optional(),
+  frequency: z.enum(["MONTHLY", "YEARLY"], {
+    required_error: "Please select a frequency",
+  }),
+  dueDate: z.date({ required_error: "Please select a due date" }),
+  categoryId: z.coerce.number().min(1, "Category is required"),
+});

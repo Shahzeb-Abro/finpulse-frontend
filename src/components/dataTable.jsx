@@ -19,7 +19,7 @@ export const DataTable = ({
   onSortingChange,
   manualPagination = false,
   pageCount: controlledPageCount,
-  pagination, // ← single source of truth
+  pagination,
   setPagination,
   totalElements,
   isLoading = false,
@@ -47,10 +47,6 @@ export const DataTable = ({
   const totalPages = manualPagination
     ? (controlledPageCount ?? 0)
     : table.getPageCount();
-
-  useEffect(() => {
-    console.log("Pagination changed", pagination);
-  }, [pagination.pageSize, pagination.pageIndex]);
 
   return (
     <div className="flex flex-col gap-0 h-[calc(100vh-350px)]! lg:h-[calc(100vh-280px)]!">

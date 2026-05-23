@@ -110,7 +110,7 @@ export const TransactionFilters = ({
       </Popover>
 
       {/* ── Export button — always visible, separate from filters ── */}
-      <Button onClick={onExport}>
+      <Button onClick={onExport} variant="secondary">
         <div className="flex items-center gap-2">
           <Download className="w-4 h-4" />
           Export PDF
