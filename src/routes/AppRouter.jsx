@@ -31,11 +31,11 @@ export const AppRouter = () => {
           <Route path={ROUTES.pots} element={<Pots />} />
           <Route path={ROUTES.recurringBills} element={<RecurringBills />} />
           <Route path={ROUTES.settings} element={<Settings />} />
-          <Route path="/ai-assistant" element={<AIAssistant />} />
+          {/* <Route path="/ai-assistant" element={<AIAssistant />} />
           <Route
             path="/ai-assistant/session/:sessionId"
             element={<AIAssistant />}
-          />
+          /> */}
         </Route>
 
         {/* Auth Routes  */}

@@ -4,7 +4,7 @@ import { getBudgetSummary } from "@/api/budget";
 import { useCurrency } from "@/context/CurrencyContext";
 
 export const BudgetsSummary = () => {
-  const { currencySymbol, formatAmount } = useCurrency();
+  const { formatAmount } = useCurrency();
   const { data } = useQuery({
     queryKey: ["budgetsSummary"],
     queryFn: getBudgetSummary,
