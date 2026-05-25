@@ -14,6 +14,7 @@ import { IconCaretRight } from "./IconCaretRight";
 import { IconDotsHorizontal } from "./IconDotsHorizontal";
 import { IconBillsOutlined } from "./IconBillsOutlined";
 import { IconMagnifyGlass } from "./IconMagnifyGlass";
+import { IconJarOutlined } from "./IconJarOutlined";
 
 export {
   IconEyeOpen,
@@ -32,4 +33,5 @@ export {
   IconDotsHorizontal,
   IconBillsOutlined,
   IconMagnifyGlass,
+  IconJarOutlined,
 };

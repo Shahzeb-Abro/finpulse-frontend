@@ -40,12 +40,12 @@ const NAV_ITEMS = [
     label: "Pots",
     to: ROUTES.pots,
   },
-  {
-    id: 5,
-    icon: <BotMessageSquare height={24} />,
-    label: "AI Assistant",
-    to: ROUTES.aiAssistant,
-  },
+  // {
+  //   id: 5,
+  //   icon: <BotMessageSquare height={24} />,
+  //   label: "AI Assistant",
+  //   to: ROUTES.aiAssistant,
+  // },
   {
     id: 6,
     icon: <IconReceipt height={24} width={24} />,

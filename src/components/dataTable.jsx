@@ -23,6 +23,7 @@ export const DataTable = ({
   setPagination,
   totalElements,
   isLoading = false,
+  showPagination = true,
 }) => {
   const table = useReactTable({
     data,
@@ -47,6 +48,8 @@ export const DataTable = ({
   const totalPages = manualPagination
     ? (controlledPageCount ?? 0)
     : table.getPageCount();
+
+  console.log("DataTable render:", table.getRowModel());
 
   return (
     <div className="flex flex-col gap-0 h-[calc(100vh-350px)]! lg:h-[calc(100vh-280px)]!">
@@ -96,12 +99,12 @@ export const DataTable = ({
           <div className="flex items-center justify-center py-12 text-sm text-grey-500">
             Loading...
           </div>
-        ) : table.getRowModel().rows.length === 0 ? (
+        ) : table.getRowModel()?.rows?.length === 0 ? (
           <div className="flex items-center justify-center py-12 text-sm text-grey-500">
             No results found.
           </div>
         ) : (
-          table.getRowModel().rows.map((row) => (
+          table.getRowModel()?.rows?.map((row) => (
             <div
               key={row.id}
               className="flex items-center px-4 py-4 border-b border-grey-100 last:border-b-0 transition-colors hover:bg-beige-100/50"
@@ -125,59 +128,61 @@ export const DataTable = ({
       </div>
 
       {/* ── Pagination ── */}
-      <div className="flex items-center justify-between px-4 pt-6 pb-2">
-        {/* Left — record count */}
-        {totalElements != null ? (
-          <span className="text-xs text-grey-500">
-            {totalElements} record{totalElements !== 1 ? "s" : ""}
-          </span>
-        ) : (
-          <span />
-        )}
+      {showPagination && (
+        <div className="flex items-center justify-between px-4 pt-6 pb-2">
+          {/* Left — record count */}
+          {totalElements != null ? (
+            <span className="text-xs text-grey-500">
+              {totalElements} record{totalElements !== 1 ? "s" : ""}
+            </span>
+          ) : (
+            <span />
+          )}
 
-        {/* Center — page number buttons */}
-        <div className="flex items-center gap-1">
-          <PageButtons
-            currentPage={pagination.pageIndex}
-            totalPages={totalPages}
-            onPageChange={(p) => {
-              console.log("Page button clicked:", p);
-              table.setPageIndex(p);
-            }}
-          />
+          {/* Center — page number buttons */}
+          <div className="flex items-center gap-1">
+            <PageButtons
+              currentPage={pagination.pageIndex}
+              totalPages={totalPages}
+              onPageChange={(p) => {
+                console.log("Page button clicked:", p);
+                table.setPageIndex(p);
+              }}
+            />
+          </div>
+
+          {/* Right — Prev / Next */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 text-sm rounded-[8px] border border-grey-200 transition-colors",
+                table.getCanPreviousPage()
+                  ? "hover:bg-grey-100 cursor-pointer text-grey-900"
+                  : "opacity-40 cursor-not-allowed text-grey-400",
+              )}
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Prev
+            </button>
+
+            <button
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 text-sm rounded-[8px] border border-grey-200 transition-colors",
+                table.getCanNextPage()
+                  ? "hover:bg-grey-100 cursor-pointer text-grey-900"
+                  : "opacity-40 cursor-not-allowed text-grey-400",
+              )}
+            >
+              Next
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-
-        {/* Right — Prev / Next */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-            className={cn(
-              "flex items-center gap-2 px-3 py-2 text-sm rounded-[8px] border border-grey-200 transition-colors",
-              table.getCanPreviousPage()
-                ? "hover:bg-grey-100 cursor-pointer text-grey-900"
-                : "opacity-40 cursor-not-allowed text-grey-400",
-            )}
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Prev
-          </button>
-
-          <button
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-            className={cn(
-              "flex items-center gap-2 px-3 py-2 text-sm rounded-[8px] border border-grey-200 transition-colors",
-              table.getCanNextPage()
-                ? "hover:bg-grey-100 cursor-pointer text-grey-900"
-                : "opacity-40 cursor-not-allowed text-grey-400",
-            )}
-          >
-            Next
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
