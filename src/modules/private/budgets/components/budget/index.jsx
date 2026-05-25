@@ -5,6 +5,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useDateFormat } from "@/context/DateFormatContext";
 import { AddEditBudgetDialog, DeleteBudgetDialog } from "@/dialogs";
 import { ROUTES } from "@/routes/routes";
 import { ArrowUp } from "lucide-react";
@@ -132,6 +133,7 @@ const BudgetTransactions = ({ transactions }) => {
 
 const BudgetTransactionItem = ({ transaction }) => {
   const { formatAmount } = useCurrency();
+  const { formatDate } = useDateFormat();
   return (
     <div className="flex items-center gap-4 justify-between">
       <div className="size-10 rounded-full bg-yellow-sec flex items-center justify-center">
@@ -147,7 +149,7 @@ const BudgetTransactionItem = ({ transaction }) => {
           {formatAmount(transaction?.amount)}
         </div>
         <div className="text-xs text-grey-500">
-          {transaction?.transactionDate || "Unknown Date"}
+          {formatDate(transaction?.transactionDate) || "Unknown Date"}
         </div>
       </div>
     </div>

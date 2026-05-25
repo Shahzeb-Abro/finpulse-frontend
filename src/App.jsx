@@ -4,6 +4,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "./components/ui/sonner";
 import { IntlProvider } from "react-intl";
 import { CurrencyProvider } from "./context/CurrencyContext";
+import { DateFormatProvider } from "./context/DateFormatContext";
 
 function App() {
   const queryClient = new QueryClient();
@@ -12,7 +13,9 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <IntlProvider locale="en" defaultLocale="en">
           <CurrencyProvider>
-            <AppRouter />
+            <DateFormatProvider>
+              <AppRouter />
+            </DateFormatProvider>
           </CurrencyProvider>
           <ReactQueryDevtools />
           <Toaster position="top-right" richColors />

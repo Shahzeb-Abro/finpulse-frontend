@@ -13,6 +13,7 @@ import {
   AddEditRecurringBillDialog,
   DeleteRecurringBillDialog,
 } from "@/dialogs";
+import { useDateFormat } from "@/context/DateFormatContext";
 const SORT_MAP = {
   1: { sortBy: "nextPaymentDate", sortDir: "asc" }, // Soonest
   2: { sortBy: "nextPaymentDate", sortDir: "desc" }, // Latest
@@ -22,7 +23,7 @@ const SORT_MAP = {
   6: { sortBy: "amount", sortDir: "asc" }, // Lowest
 };
 
-const buildColumns = (formatAmount, onEdit, onDelete) => [
+const buildColumns = (formatAmount, onEdit, onDelete, formatDate) => [
   {
     accessorKey: "title",
     header: "Bill Title",
@@ -59,9 +60,7 @@ const buildColumns = (formatAmount, onEdit, onDelete) => [
                 isPaid ? "text-green-sec" : "text-grey-900",
               )}
             >
-              {nextPaymentDate
-                ? format(new Date(nextPaymentDate), "dd MMM yyyy")
-                : "—"}
+              {nextPaymentDate ? formatDate(new Date(nextPaymentDate)) : "—"}
             </span>
             <span className="text-xs text-grey-500 capitalize">
               {frequency?.toLowerCase()}
@@ -114,6 +113,7 @@ const buildColumns = (formatAmount, onEdit, onDelete) => [
 
 export const Bills = () => {
   const { formatAmount } = useCurrency();
+  const { formatDate } = useDateFormat();
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [edittingBill, setEdittingBill] = useState(null);
   const [deletingBill, setDeletingBill] = useState(null);
@@ -145,7 +145,12 @@ export const Bills = () => {
   const totalPages = data?.data?.totalPages ?? 0;
   const totalElements = data?.data?.totalElements ?? 0;
 
-  const columns = buildColumns(formatAmount, setEdittingBill, setDeletingBill);
+  const columns = buildColumns(
+    formatAmount,
+    setEdittingBill,
+    setDeletingBill,
+    formatDate,
+  );
 
   return (
     <div className="py-6 px-5 flex flex-col gap-6 bg-white rounded-[12px]">

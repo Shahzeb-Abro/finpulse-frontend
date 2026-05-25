@@ -11,6 +11,7 @@ import { AddEditTransactionDialog, DeleteTransactionDialog } from "@/dialogs";
 import { useSearchParams } from "react-router-dom";
 import { TransactionFilters } from "..";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useDateFormat } from "@/context/DateFormatContext";
 
 // ─── Sort map — IDs aligned to SortByDropdown options ─────────
 // Latest=1, Oldest=2, A to Z=3, Z to A=4, Highest=5, Lowest=6
@@ -24,7 +25,7 @@ const SORT_MAP = {
 };
 
 // ─── Column definitions ────────────────────────────────────────
-const buildColumns = (onEdit, onDelete, formatAmount) => [
+const buildColumns = (onEdit, onDelete, formatAmount, formatDate) => [
   {
     accessorKey: "description",
     header: "Description",
@@ -69,11 +70,7 @@ const buildColumns = (onEdit, onDelete, formatAmount) => [
     size: 130,
     cell: ({ getValue }) => {
       const val = getValue();
-      return (
-        <span className="text-xs text-grey-500">
-          {val ? format(new Date(val), "dd MMM yyyy") : "—"}
-        </span>
-      );
+      return <span className="text-xs text-grey-500">{formatDate(val)}</span>;
     },
   },
   {
@@ -126,6 +123,7 @@ const buildColumns = (onEdit, onDelete, formatAmount) => [
 // ─── Main Component ────────────────────────────────────────────
 export const TransactionsTable = () => {
   const { formatAmount } = useCurrency();
+  const { formatDate } = useDateFormat();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get("page") ?? 0);
@@ -279,6 +277,7 @@ export const TransactionsTable = () => {
     setEditingTransaction,
     setDeletingTransaction,
     formatAmount,
+    formatDate,
   );
 
   const activeFilterCount = [
