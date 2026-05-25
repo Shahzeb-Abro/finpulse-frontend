@@ -2,6 +2,7 @@ import { getTransactions } from "@/api/transaction";
 import { DataTable } from "@/components/dataTable";
 import { IconCaretRight } from "@/components/icons";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useDateFormat } from "@/context/DateFormatContext";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/routes/routes";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +10,7 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import { FormattedDate } from "react-intl";
 import { Link } from "react-router-dom";
 
-const buildColumns = (formatAmount) => [
+const buildColumns = (formatAmount, formatDate) => [
   {
     accessorKey: "overview",
     header: "",
@@ -39,12 +40,7 @@ const buildColumns = (formatAmount) => [
               {formatAmount(amount)}
             </span>
             <span className="text-xs text-grey-500">
-              <FormattedDate
-                value={transactionDate}
-                month="short"
-                day="numeric"
-                year="numeric"
-              />
+              {formatDate(transactionDate)}
             </span>
           </div>
         </div>
@@ -55,6 +51,7 @@ const buildColumns = (formatAmount) => [
 
 export const TransactionsCard = () => {
   const { formatAmount } = useCurrency();
+  const { formatDate } = useDateFormat();
   const { data, isFetching } = useQuery({
     queryKey: ["transactions"],
     queryFn: () => {
@@ -66,7 +63,7 @@ export const TransactionsCard = () => {
     },
   });
 
-  const columns = buildColumns(formatAmount);
+  const columns = buildColumns(formatAmount, formatDate);
 
   const transactions = data?.data?.content ?? [];
   const totalPages = data?.data?.totalPages ?? 0;

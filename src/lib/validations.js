@@ -71,6 +71,7 @@ export const transactionSchema = z.object({
 
 export const preferencesSchema = z.object({
   currency: z.coerce.number().min(1, "Currency is required"),
+  dateFormat: z.string().min(1, "Date format is required"),
 });
 
 export const recurringBillSchema = z.object({
