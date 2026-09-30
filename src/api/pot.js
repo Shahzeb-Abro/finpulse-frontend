@@ -93,3 +93,18 @@ export const withdrawMoneyFromPot = async ({ potId, amount }) => {
     );
   }
 };
+
+export const getPotDetails = async (potId) => {
+  try {
+    const response = await api.get(`${BASE_URL}/${potId}`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    throw (
+      error.response?.data ||
+      error.message ||
+      "An error occurred while fetching pot details."
+    );
+  }
+};

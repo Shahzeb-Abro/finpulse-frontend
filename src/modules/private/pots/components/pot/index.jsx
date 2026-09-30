@@ -11,8 +11,10 @@ import {
   AddWithdrawPotDialog,
   DeletePotDialog,
 } from "@/dialogs";
+import { useNavigate } from "react-router-dom";
 
 export const Pot = ({ pot }) => {
+  const navigate = useNavigate();
   return (
     <div className="py-6 px-5 rounded-[12px] bg-white flex flex-col gap-8">
       <div className="flex items-center gap-4 justify-between">
@@ -21,7 +23,13 @@ export const Pot = ({ pot }) => {
             className="size-4 rounded-full shrink-0"
             style={{ backgroundColor: pot?.themeLookupValue }}
           ></span>
-          <span className="text-lg font-bold">{pot?.name}</span>
+          <span
+            className="text-lg font-bold hover:underline cursor-pointer"
+            role="button"
+            onClick={() => navigate(`/pots/${pot?.id}`)}
+          >
+            {pot?.name}
+          </span>
         </div>
         <div>
           <PotOptionsMenu pot={pot} />

@@ -17,6 +17,7 @@ import {
   Transactions,
 } from "@/modules/private";
 import { AIAssistant } from "@/modules/private/aiAssistant";
+import { PotDetails } from "@/modules/private/potDetails";
 
 export const AppRouter = () => {
   return (
@@ -31,6 +32,7 @@ export const AppRouter = () => {
           <Route path={ROUTES.pots} element={<Pots />} />
           <Route path={ROUTES.recurringBills} element={<RecurringBills />} />
           <Route path={ROUTES.settings} element={<Settings />} />
+          <Route path="/pots/:potId" element={<PotDetails />} />
           {/* <Route path="/ai-assistant" element={<AIAssistant />} />
           <Route
             path="/ai-assistant/session/:sessionId"

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export const DeletePotDialog = ({
@@ -22,6 +23,7 @@ export const DeletePotDialog = ({
 }) => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { mutate: deletePotMutation, isPending } = useMutation({
     mutationFn: deletePot,
     onSuccess: () => {
@@ -38,6 +40,7 @@ export const DeletePotDialog = ({
         };
       });
       setOpen(false);
+      navigate("/pots");
     },
     onError: (error) => {
       toast.error(error?.message || "Failed to delete pot. Please try again.");

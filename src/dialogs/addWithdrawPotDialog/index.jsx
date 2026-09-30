@@ -61,6 +61,8 @@ export const AddWithdrawPotDialog = ({
           },
         };
       });
+
+      queryClient.invalidateQueries(["potDetails"]);
       setOpen(false);
       form.reset();
     },
